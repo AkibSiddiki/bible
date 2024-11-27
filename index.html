@@ -202,7 +202,7 @@
         // Populate chapters dropdown dynamically based on selected book
         function populateChapters(selectedBook) {
             const chapterSelect = document.getElementById('chapterSelect'); // Get the chapter dropdown element
-            chapterSelect.innerHTML = ''; // Clear previous options
+            chapterSelect.innerHTML = `<option value="" disabled selected>Select a chapter</option>`; // Clear previous options
 
             // Find the selected book in the booksWithChapters array
             const book = booksWithChapters.find(b => b.name === selectedBook);
