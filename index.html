@@ -35,16 +35,15 @@
             background-color: #f8f9fa;
             border-radius: 5px;
         }
+
         #output p {
-             line-height: 1.8;
-             font-size: 21px;
-             word-spacing: 2px;
-             letter-spacing: 0.3px;
-             font-weight: 400;
-             padding: 0 80px;
-         }
-
-
+            line-height: 1.8;
+            font-size: 21px;
+            word-spacing: 2px;
+            letter-spacing: 0.3px;
+            font-weight: 400;
+            padding: 0 15px;
+        }
     </style>
 </head>
 
@@ -55,25 +54,27 @@
         <form class="row g-3">
             <div class="col-md-4">
                 <label for="version" class="form-label fw-bold">Select Version</label>
-                <select id="versionID" class="form-select"></select>
+                <select id="versionID" class="form-select">
+                    <option value="" disabled selected>Select a version</option>
+                </select>
             </div>
 
             <div class="col-md-4">
                 <label for="book" class="form-label fw-bold">Select Book</label>
-                <select id="bookID" class="form-select"></select>
+                <select id="bookSelect" class="form-select">
+                    <option value="" disabled selected>Select a book</option>
+                </select>
             </div>
 
             <div class="col-md-4">
                 <label for="chapter" class="form-label fw-bold">Select Chapter</label>
-                <select id="chapterID" class="form-select"></select>
-            </div>
-
-            <div class="col-12 text-center">
-                <button type="button" id="fetch" class="btn btn-dark">SUBMIT</button>
+                <select id="chapterSelect" class="form-select">
+                    <option value="" disabled selected>Select a chapter</option>
+                </select>
             </div>
         </form>
 
-        <div id="output" class="mt-4">
+        <div id="output" class="my-4">
             <p class="text-muted m-4 p-4 text-center">Selected content will appear here.</p>
         </div>
     </div>
@@ -84,10 +85,9 @@
 
     <script>
         const versionSelect = document.getElementById('versionID');
-        const bookSelect = document.getElementById('bookID');
-        const chapterSelect = document.getElementById('chapterID');
+        const bookSelect = document.getElementById('bookSelect');
+        const chapterSelect = document.getElementById('chapterSelect');
         const output = document.getElementById('output');
-        const fetchButton = document.getElementById('fetch');
 
         // List of books for simplicity
         const books = [
@@ -106,6 +106,76 @@
             "1-peter", "2-peter", "1-john", "2-john", "3-john", "jude", "revelation"
         ];
 
+        const booksWithChapters = [
+            { name: "genesis", chapters: 50 },
+            { name: "exodus", chapters: 40 },
+            { name: "leviticus", chapters: 27 },
+            { name: "numbers", chapters: 36 },
+            { name: "deuteronomy", chapters: 34 },
+            { name: "joshua", chapters: 24 },
+            { name: "judges", chapters: 21 },
+            { name: "ruth", chapters: 4 },
+            { name: "1-samuel", chapters: 31 },
+            { name: "2-samuel", chapters: 24 },
+            { name: "1-kings", chapters: 22 },
+            { name: "2-kings", chapters: 25 },
+            { name: "1-chronicles", chapters: 29 },
+            { name: "2-chronicles", chapters: 36 },
+            { name: "ezra", chapters: 10 },
+            { name: "nehemiah", chapters: 13 },
+            { name: "esther", chapters: 10 },
+            { name: "job", chapters: 42 },
+            { name: "psalms", chapters: 150 },
+            { name: "proverbs", chapters: 31 },
+            { name: "ecclesiastes", chapters: 12 },
+            { name: "song-of-songs", chapters: 8 },
+            { name: "isaiah", chapters: 66 },
+            { name: "jeremiah", chapters: 52 },
+            { name: "lamentations", chapters: 5 },
+            { name: "ezekiel", chapters: 48 },
+            { name: "daniel", chapters: 12 },
+            { name: "hosea", chapters: 14 },
+            { name: "joel", chapters: 3 },
+            { name: "amos", chapters: 9 },
+            { name: "obadiah", chapters: 1 },
+            { name: "jonah", chapters: 4 },
+            { name: "micah", chapters: 7 },
+            { name: "nahum", chapters: 3 },
+            { name: "habakkuk", chapters: 3 },
+            { name: "zephaniah", chapters: 3 },
+            { name: "haggai", chapters: 2 },
+            { name: "zechariah", chapters: 14 },
+            { name: "malachi", chapters: 4 },
+            { name: "matthew", chapters: 28 },
+            { name: "mark", chapters: 16 },
+            { name: "luke", chapters: 24 },
+            { name: "john", chapters: 21 },
+            { name: "acts", chapters: 28 },
+            { name: "romans", chapters: 16 },
+            { name: "1-corinthians", chapters: 16 },
+            { name: "2-corinthians", chapters: 13 },
+            { name: "galatians", chapters: 6 },
+            { name: "ephesians", chapters: 6 },
+            { name: "philippians", chapters: 4 },
+            { name: "colossians", chapters: 4 },
+            { name: "1-thessalonians", chapters: 5 },
+            { name: "2-thessalonians", chapters: 3 },
+            { name: "1-timothy", chapters: 6 },
+            { name: "2-timothy", chapters: 4 },
+            { name: "titus", chapters: 3 },
+            { name: "philemon", chapters: 1 },
+            { name: "hebrews", chapters: 13 },
+            { name: "james", chapters: 5 },
+            { name: "1-peter", chapters: 5 },
+            { name: "2-peter", chapters: 3 },
+            { name: "1-john", chapters: 5 },
+            { name: "2-john", chapters: 1 },
+            { name: "3-john", chapters: 1 },
+            { name: "jude", chapters: 1 },
+            { name: "revelation", chapters: 22 }
+        ];
+
+
         // Load Bible versions
         async function loadVersions() {
             const response = await fetch('https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/bibles.json');
@@ -120,24 +190,43 @@
 
         // Populate books dropdown
         function populateBooks() {
-            books.forEach(book => {
+            const bookSelect = document.getElementById('bookSelect'); // Get the book dropdown element
+            booksWithChapters.forEach(book => {
                 const option = document.createElement('option');
-                option.value = book.replace('-', '').toLowerCase();
-                option.textContent = book.replace(/-/g, ' ').toUpperCase();
+                option.value = book.name; // Use the book name as the value
+                option.textContent = book.name.replace(/-/g, ' ').toUpperCase(); // Display book name
                 bookSelect.appendChild(option);
             });
         }
 
-        // Populate chapters dropdown
-        function populateChapters() {
+        // Populate chapters dropdown dynamically based on selected book
+        function populateChapters(selectedBook) {
+            const chapterSelect = document.getElementById('chapterSelect'); // Get the chapter dropdown element
             chapterSelect.innerHTML = ''; // Clear previous options
-            for (let i = 1; i <= 150; i++) { // Assuming a max of 150 chapters for simplicity
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                chapterSelect.appendChild(option);
+
+            // Find the selected book in the booksWithChapters array
+            const book = booksWithChapters.find(b => b.name === selectedBook);
+
+            // Populate chapters if the book is found
+            if (book) {
+                for (let i = 1; i <= book.chapters; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i;
+                    chapterSelect.appendChild(option);
+                }
             }
         }
+
+        // Initialize the books dropdown and add event listener for chapters
+        document.addEventListener('DOMContentLoaded', () => {
+            populateBooks(); // Populate books on page load
+
+            const bookSelect = document.getElementById('bookSelect'); // Book dropdown element
+            bookSelect.addEventListener('change', function () {
+                populateChapters(this.value); // Populate chapters based on selected book
+            });
+        });
 
         // Fetch selected chapter
         async function fetchChapter() {
@@ -151,10 +240,10 @@
                 output.innerHTML = '<p class="text-danger text-center m-4 p-4">Please select a version, book, and chapter.</p>';
                 return;
             }
-
+            var bookid = book.replace('-', '').toLowerCase();
             console.log(version, book, chapter);
 
-            const url = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/${version}/books/${book}/chapters/${chapter}.json`;
+            const url = `https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/${version}/books/${bookid}/chapters/${chapter}.json`;
             console.log(url);
             try {
                 let headersList = {
@@ -186,7 +275,9 @@
         }
 
         // Event listeners
-        fetchButton.addEventListener('click', fetchChapter);
+        versionSelect.addEventListener('change', fetchChapter);
+        bookSelect.addEventListener('change', fetchChapter);
+        chapterSelect.addEventListener('change', fetchChapter);
 
         // Initialize
         loadVersions();
