@@ -286,10 +286,32 @@
             }
         }
 
-        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            populateVersionSelector();
+            populateBooks();
+
+            const defaultVersion = "en-kjv";
+            const defaultBook = "john";
+            const defaultChapter = 3;
+
+            setTimeout(() => {
+                versionSelect.value = defaultVersion;
+                bookSelect.value = defaultBook;
+                populateChapters(defaultBook);
+
+                setTimeout(() => {
+                    chapterSelect.value = defaultChapter;
+                    fetchChapter();
+                }, 100);
+            }, 100);
+        });
+
         versionSelect.addEventListener('change', fetchChapter);
-        // bookSelect.addEventListener('change', fetchChapter);
         chapterSelect.addEventListener('change', fetchChapter);
+
+        // Event listeners
+        // bookSelect.addEventListener('change', fetchChapter);
+      
 
         // Initialize
         loadVersions();
